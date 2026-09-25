@@ -14,6 +14,13 @@ Open the built-in chat UI at [http://127.0.0.1:8080](http://127.0.0.1:8080),
 or point any OpenAI-compatible client (e.g. [Continue](https://continue.dev))
 at `http://127.0.0.1:8080/v1`.
 
+Then verify everything's actually working, not just running:
+
+```sh
+./scripts/verify.sh      # Linux/macOS
+.\scripts\verify.ps1     # Windows
+```
+
 ## Documentation
 
 - [docs/architecture.md](docs/architecture.md) — how the pieces fit together
@@ -30,4 +37,6 @@ at `http://127.0.0.1:8080/v1`.
 compose.yaml   # the two-service stack (bunker + proxy)
 proxy/         # custom reverse proxy (date/time injection)
 models/        # GGUF model weights (gitignored)
+scripts/       # verify/healthcheck/benchmark — .sh and .ps1 entrypoints,
+               # shared Python logic in scripts/lib/
 ```

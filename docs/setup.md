@@ -39,55 +39,34 @@ docker compose up -d --build
 First run pulls `ghcr.io/ggml-org/llama.cpp:server` and builds the
 `proxy` image from `proxy/Dockerfile`.
 
-## 6. Verify health
+## 6-9. Verify health, inference, network isolation, non-root execution
+
+`scripts/verify.{sh,ps1}` runs all four checks and exits non-zero if any
+fail:
 
 ```sh
-docker compose ps
+./scripts/verify.sh      # Linux/macOS
 ```
 
-Both `bunker` and `proxy` should show `Up`/`healthy`. Then:
-
-```sh
-docker compose logs bunker
+```powershell
+.\scripts\verify.ps1      # Windows
 ```
 
-Look for `llama_server: model loaded` and
-`listening on http://0.0.0.0:8080`. If you see a
-`mismatch between text model and mmproj` error instead, see
-[troubleshooting.md](troubleshooting.md).
+It checks, in order: `bunker`/`proxy` are running, `bunker`'s logs
+contain `model loaded`, a real chat completion returns non-empty
+content, `bunker` cannot reach the internet, and both containers run as
+uid 1000. See [scripts/lib/verify.py](../scripts/lib/verify.py) for
+exactly what each step does — both entrypoints call the same Python
+logic, there's no divergence between platforms to worry about.
 
-## 7. Verify inference
+If "Model loaded" fails, look for a `mismatch between text model and
+mmproj` error in `docker compose logs bunker` — see
+[troubleshooting.md](troubleshooting.md). Once the stack's up day to day,
+`scripts/healthcheck.{sh,ps1}` is a faster containers+API-only check for
+routine use; `scripts/benchmark.{sh,ps1}` measures tokens/sec.
 
-```sh
-curl -sN -X POST http://127.0.0.1:8080/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model":"MiniCPM-V-4_6-Q4_K_M.gguf","messages":[{"role":"user","content":"ciao"}],"stream":true,"max_tokens":30}'
-```
-
-Expect `data: {...}` SSE chunks with non-null `content` fields, ending in
-`data: [DONE]`. Or open [http://127.0.0.1:8080](http://127.0.0.1:8080)
+You can also just open [http://127.0.0.1:8080](http://127.0.0.1:8080)
 for llama.cpp's built-in chat UI.
-
-## 8. Verify network isolation
-
-Confirm `bunker` has no route out:
-
-```sh
-docker compose exec bunker sh -c "curl -m 3 -sI https://example.com" || echo "no egress (expected)"
-```
-
-This should fail — `bunker` sits on the `internal: true` network with no
-published ports (see [architecture.md](architecture.md) and
-[security.md](security.md)).
-
-## 9. Verify non-root execution
-
-```sh
-docker compose exec bunker id
-docker compose exec proxy id
-```
-
-Both should report `uid=1000`, not `uid=0(root)`.
 
 ## Stopping
 

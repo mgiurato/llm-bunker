@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Added
+
+- `scripts/{healthcheck,verify,benchmark}.{sh,ps1}` — cross-platform
+  entrypoints sharing one Python implementation in `scripts/lib/`, so
+  there's a single source of truth for what "healthy"/"verified" means
+  instead of duplicated shell logic per OS.
+- `--ctx-size` raised from 8192 to 32768 tokens; measured impact on idle
+  and under-load memory was negligible for this model/quantization.
+- `mem_limit: 16g` hard cap on `bunker`, as a safety ceiling.
+- GGUF quantization naming glossary in `docs/models.md` (`Q`/`IQ`/`K`
+  schemes, bit-depth, `_S`/`_M`/`_L`/`_XS` suffixes).
+
+### Removed
+
+- Empty, unused `config/` directory.
+
 ## [1.0.0] - 2026-09-25
 
 ### Added

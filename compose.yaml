@@ -3,6 +3,8 @@ services:
     image: ghcr.io/ggml-org/llama.cpp:server
     user: "1000:1000"
 
+    mem_limit: "16g"
+
     command:
       - --host
       - 0.0.0.0
@@ -11,7 +13,7 @@ services:
       - --model
       - /models/MiniCPM-V-4_6-Q4_K_M.gguf
       - --ctx-size
-      - "8192"
+      - "32768"
       - --no-models-autoload
       - --reasoning
       - "off"
