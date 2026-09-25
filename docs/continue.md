@@ -1,0 +1,78 @@
+# Continue integration
+
+[Continue](https://continue.dev) can talk to `bunker` directly, since
+llama.cpp's server exposes an OpenAI-compatible API and `proxy` publishes
+it on `127.0.0.1:8080`.
+
+```mermaid
+flowchart TD
+    vscode["VS Code"] --> continue["Continue"]
+    continue -- "OpenAI-compatible API" --> apiBase["http://127.0.0.1:8080/v1"]
+    apiBase --> llamacpp["llama.cpp"]
+```
+
+## Config
+
+In `~/.continue/config.yaml`, add a model entry using the `openai`
+provider — not a "local"/"llama.cpp"-specific provider, since Continue
+doesn't have one. `provider` in Continue selects the wire protocol to
+speak, not the actual company; `openai` is the adapter for any
+OpenAI-compatible server, and `apiBase` points it at this stack instead
+of OpenAI's real servers:
+
+```yaml
+models:
+  - name: MiniCPM-V (local bunker)
+    provider: openai
+    model: MiniCPM-V-4_6-Q4_K_M.gguf
+    apiBase: http://127.0.0.1:8080/v1
+    apiKey: none
+    defaultCompletionOptions:
+      contextLength: 8192
+      maxTokens: 512
+    roles:
+      - chat
+      - edit
+      - apply
+```
+
+Notes:
+
+- `apiKey` is a placeholder — the server has no `--api-key` set, so
+  nothing actually authenticates, but Continue's schema wants the field
+  present.
+- `model` just needs to be *a* string; llama.cpp serves whichever single
+  model it loaded regardless of what's requested.
+- `maxTokens: 512` caps generation so a request can't run indefinitely.
+  Combined with `--reasoning off` on the server (see
+  [models.md](models.md)), this budget is spent on visible output, not
+  invisible chain-of-thought.
+- This only works while `docker compose up` is running — specifically
+  the `proxy` service, since that's what's bound to `127.0.0.1:8080`.
+
+## Performance expectations
+
+CPU-only inference: roughly 70–80 tokens/sec prompt processing, 7–12
+tokens/sec generation, on this machine. Agent mode in Continue sends
+substantial system-prompt/tool-schema overhead on every request (often
+1000+ tokens even for a short message), which dominates latency more
+than the visible reply length does. For faster local chat:
+
+- Prefer plain **Chat mode** over **Agent mode** when you don't need
+  Continue's tools (file edit, terminal, etc.) — Agent mode's tool
+  schemas add most of the per-request overhead.
+- Avoid `@codebase` / `@docs` context providers with this model unless
+  necessary; each one adds retrieved text to the prompt.
+- Keep conversations short — Continue resends the full history each
+  turn.
+
+## Known gotcha: tool-call prompts
+
+If a chat message triggers something like "Allow use of `get_datetime`
+from Browser Tools?", see
+[troubleshooting.md](troubleshooting.md#the-model-keeps-asking-to-call-a-tool).
+That specific case turned out to be llama.cpp's *own* built-in web UI
+tool settings, not Continue — but the same failure mode (a tool schema
+being offered contradicts a text instruction saying "no tools
+available") can happen with any agentic client, including Continue's
+own tool set.
