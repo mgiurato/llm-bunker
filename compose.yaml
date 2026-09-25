@@ -3,7 +3,9 @@ services:
     image: ghcr.io/ggml-org/llama.cpp:server
     user: "1000:1000"
 
-    mem_limit: "16g"
+    # Docker Desktop's WSL2 VM only has ~15.6g total; 16g here would exceed
+    # that, leaving no headroom for the proxy container or VM overhead.
+    mem_limit: "12g"
 
     command:
       - --host
@@ -17,6 +19,11 @@ services:
       - --no-models-autoload
       - --reasoning
       - "off"
+      - --no-agent
+      - --cache-type-k
+      - q8_0
+      - --cache-type-v
+      - q8_0
 
     # No ports here on purpose: this network is internal, so the container
     # has zero route to the internet. Reach it only through the proxy below.

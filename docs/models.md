@@ -33,16 +33,17 @@ below if these codes are unfamiliar.
 
 ```text
 Repository:
-  https://huggingface.co/openbmb/MiniCPM-V-4.6      (model card / base)
+  https://huggingface.co/openbmb/MiniCPM-V-4_6-gguf (official GGUF build)
+  https://huggingface.co/openbmb/MiniCPM-V-4_6      (model card / base)
   https://github.com/openbmb/minicpm                (source / docs)
-  GGUF build: community conversion repo (Patricck1) offering
-  F16, Q4_0/Q4_1, Q4_K_M, Q4_K_S, Q5_*, Q6_K, Q8_0 + matching mmproj
+  Offers F16, Q4_0/Q4_1, Q4_K_M, Q4_K_S, Q5_*, Q6_K, Q8_0 + matching mmproj
 
 Filename:
   MiniCPM-V-4_6-Q4_K_M.gguf
 
 Size:
-  ~529 MB
+  ~529 MB (SigLIP2-400M vision encoder + Qwen3.5-0.8B LLM backbone —
+  this is a genuinely small ~1B-param model, not a typo/bad download)
 
 SHA256:
   6b0c74962c44bc6bf4b655b9b02c13eda9d5a0491543ae976d1ac18e4b7892e

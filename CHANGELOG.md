@@ -2,6 +2,32 @@
 
 All notable changes to this project are documented here.
 
+## [1.2.0] - 2026-09-25
+
+### Added
+
+- `--no-agent` on `bunker`, explicitly disabling llama.cpp's built-in
+  agent tools (`exec_shell_command`, `write_file`, `edit_file`, etc.).
+  Already the default, but pins it against a future upstream default
+  change — this stack's isolated network is designed around the model
+  having no such capability at all.
+- `--cache-type-k`/`--cache-type-v` set to `q8_0` on `bunker`,
+  quantizing the KV cache to reduce memory pressure at
+  `--ctx-size 32768`.
+
+### Changed
+
+- `mem_limit` on `bunker` lowered from `16g` to `12g`. The previous
+  value exceeded Docker Desktop's WSL2 VM total memory (~15.6g), so it
+  wasn't actually enforceable as a cgroup limit and left no headroom
+  for `proxy` or VM overhead — the VM would OOM before the container
+  limit ever triggered.
+- `docs/models.md`'s MiniCPM-V-4.6 entry now points at the official
+  `openbmb/MiniCPM-V-4_6-gguf` repository instead of a community
+  conversion, and clarifies the model is genuinely a ~1B-parameter
+  model (SigLIP2-400M vision encoder + Qwen3.5-0.8B LLM backbone), not
+  a bad or mislabeled download as its small file size might suggest.
+
 ## [1.1.0] - 2026-09-25
 
 ### Added
