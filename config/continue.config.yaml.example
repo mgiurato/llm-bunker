@@ -23,7 +23,7 @@ models:
     apiBase: http://127.0.0.1:8080/v1
     apiKey: none
     defaultCompletionOptions:
-      contextLength: 8192
+      contextLength: 32768
       maxTokens: 512
     roles:
       - chat

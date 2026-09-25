@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## [Unreleased]
+## [1.1.0] - 2026-09-25
 
 ### Added
 
@@ -29,6 +29,13 @@ All notable changes to this project are documented here.
   repeated `### Added`/`### Removed` across CHANGELOG version sections
   don't trip it) and excludes code blocks/tables from `MD013` line
   length.
+
+### Fixed
+
+- `config/continue.config.yaml.example` and `docs/continue.md`'s
+  MiniCPM-V entry still had `contextLength: 8192`, left over from
+  before `--ctx-size` was raised to 32768 — now matches the other
+  model entries and `compose.yaml`.
 
 ## [1.0.0] - 2026-09-25
 
