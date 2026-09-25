@@ -1,0 +1,16 @@
+# Local LLM weights - NEVER commit these
+models/*
+!models/.gitkeep
+
+# Local configuration / secrets
+.env
+.env.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs / runtime
+*.log

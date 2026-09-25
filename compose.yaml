@@ -1,0 +1,65 @@
+services:
+  bunker:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    user: "1000:1000"
+
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --model
+      - /models/MiniCPM-V-4_6-Q4_K_M.gguf
+      - --ctx-size
+      - "8192"
+      - --no-models-autoload
+
+    # No ports here on purpose: this network is internal, so the container
+    # has zero route to the internet. Reach it only through the proxy below.
+
+    volumes:
+      - ./models:/models:ro
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    read_only: true
+
+    tmpfs:
+      - /tmp
+
+    networks:
+      - bunker
+
+  proxy:
+    image: alpine/socat
+
+    command:
+      - tcp-listen:8080,fork,reuseaddr
+      - tcp-connect:bunker:8080
+
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    read_only: true
+
+    depends_on:
+      - bunker
+
+    networks:
+      - bunker
+      - front
+
+networks:
+  bunker:
+    internal: true
+  front:

@@ -1,0 +1,15 @@
+.git
+.gitignore
+.dockerignore
+
+models/
+docs/
+scripts/
+
+.env
+.env.local
+
+.vscode/
+.idea/
+
+*.log
