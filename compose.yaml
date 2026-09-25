@@ -13,6 +13,8 @@ services:
       - --ctx-size
       - "8192"
       - --no-models-autoload
+      - --reasoning
+      - "off"
 
     # No ports here on purpose: this network is internal, so the container
     # has zero route to the internet. Reach it only through the proxy below.
@@ -35,11 +37,13 @@ services:
       - bunker
 
   proxy:
-    image: alpine/socat
+    build:
+      context: ./proxy
 
-    command:
-      - tcp-listen:8080,fork,reuseaddr
-      - tcp-connect:bunker:8080
+    # Reverse proxy to bunker's llama.cpp server: forwards requests as-is,
+    # except it injects a system message with the live UTC date/time into
+    # /v1/chat/completions requests, since the model otherwise has no clock
+    # and no internet to check one.
 
     ports:
       - "127.0.0.1:8080:8080"
