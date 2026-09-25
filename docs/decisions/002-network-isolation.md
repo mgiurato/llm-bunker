@@ -38,5 +38,6 @@ port.
   network.
 - This isolation only covers the container/network layer. It does not
   protect against tool calls initiated by a client application on the
-  model's behalf (see [security.md](../security.md#what-this-does-not-protect-against)) —
-  that's a client-side concern, not something network policy can fix.
+  model's behalf — that's a client-side concern, not something network
+  policy can fix. See
+  [security.md](../security.md#what-this-does-not-protect-against).

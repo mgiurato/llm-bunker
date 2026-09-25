@@ -1,0 +1,83 @@
+# Example Continue config for llm-bunker (~/.continue/config.yaml).
+#
+# IMPORTANT: bunker only ever has ONE GGUF loaded at a time, controlled by
+# MODEL_FILE (see .env.example / docs/models.md). llama.cpp ignores
+# whatever `model` string a client sends — it just answers with whatever
+# is actually loaded. Continue's `name` here is only a label; it does NOT
+# switch which model bunker is running.
+#
+# To avoid confusion, keep only the ONE entry below uncommented that
+# matches your current MODEL_FILE, mirroring .env.example. If you swap
+# models (MODEL_FILE + `docker compose up -d --force-recreate bunker`),
+# swap which entry is uncommented here too.
+#
+# See docs/continue.md for the full integration writeup.
+
+name: Main Config
+version: 1.0.0
+schema: v1
+models:
+  - name: MiniCPM-V (local bunker)
+    provider: openai
+    model: MiniCPM-V-4_6-Q4_K_M.gguf
+    apiBase: http://127.0.0.1:8080/v1
+    apiKey: none
+    defaultCompletionOptions:
+      contextLength: 8192
+      maxTokens: 512
+    roles:
+      - chat
+      - edit
+      - apply
+
+  # - name: Hermes-3-Llama-3.1-8B (local bunker)
+  #   provider: openai
+  #   model: Hermes-3-Llama-3.1-8B.Q4_K_M.gguf
+  #   apiBase: http://127.0.0.1:8080/v1
+  #   apiKey: none
+  #   defaultCompletionOptions:
+  #     contextLength: 32768
+  #     maxTokens: 512
+  #   roles:
+  #     - chat
+  #     - edit
+  #     - apply
+
+  # - name: Qwen2.5-Coder-7B-Instruct (local bunker)
+  #   provider: openai
+  #   model: Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
+  #   apiBase: http://127.0.0.1:8080/v1
+  #   apiKey: none
+  #   defaultCompletionOptions:
+  #     contextLength: 32768
+  #     maxTokens: 512
+  #   roles:
+  #     - chat
+  #     - edit
+  #     - apply
+
+  # - name: Llama-3.2-3B-Instruct (local bunker)
+  #   provider: openai
+  #   model: llama-3.2-3b-instruct-q4_k_m.gguf
+  #   apiBase: http://127.0.0.1:8080/v1
+  #   apiKey: none
+  #   defaultCompletionOptions:
+  #     contextLength: 32768
+  #     maxTokens: 512
+  #   roles:
+  #     - chat
+  #     - edit
+  #     - apply
+
+  # - name: Phi-4-mini-instruct (local bunker)
+  #   provider: openai
+  #   model: microsoft_Phi-4-mini-instruct-Q4_K_M.gguf
+  #   apiBase: http://127.0.0.1:8080/v1
+  #   apiKey: none
+  #   defaultCompletionOptions:
+  #     contextLength: 32768
+  #     maxTokens: 512
+  #   roles:
+  #     - chat
+  #     - edit
+  #     - apply

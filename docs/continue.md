@@ -13,12 +13,14 @@ flowchart TD
 
 ## Config
 
-In `~/.continue/config.yaml`, add a model entry using the `openai`
-provider — not a "local"/"llama.cpp"-specific provider, since Continue
-doesn't have one. `provider` in Continue selects the wire protocol to
-speak, not the actual company; `openai` is the adapter for any
-OpenAI-compatible server, and `apiBase` points it at this stack instead
-of OpenAI's real servers:
+Copy
+[config/continue.config.yaml.example](../config/continue.config.yaml.example)
+to `~/.continue/config.yaml` (or merge it into your existing one). It
+uses the `openai` provider — not a "local"/"llama.cpp"-specific
+provider, since Continue doesn't have one. `provider` in Continue
+selects the wire protocol to speak, not the actual company; `openai` is
+the adapter for any OpenAI-compatible server, and `apiBase` points it at
+this stack instead of OpenAI's real servers:
 
 ```yaml
 models:
@@ -38,11 +40,17 @@ models:
 
 Notes:
 
+- **`bunker` only ever has one GGUF loaded at a time** (see
+  [models.md](models.md#selecting-which-model-to-load)). llama.cpp
+  ignores whatever `model` string a client sends and just answers with
+  whatever's actually loaded. The example file lists an entry per
+  available model, but only one should be uncommented at a time —
+  matching whatever `MODEL_FILE` `bunker` was started with — or Continue
+  will show a model picker where the "wrong" selection silently gets
+  answered by a different model than its label claims.
 - `apiKey` is a placeholder — the server has no `--api-key` set, so
   nothing actually authenticates, but Continue's schema wants the field
   present.
-- `model` just needs to be *a* string; llama.cpp serves whichever single
-  model it loaded regardless of what's requested.
 - `maxTokens: 512` caps generation so a request can't run indefinitely.
   Combined with `--reasoning off` on the server (see
   [models.md](models.md)), this budget is spent on visible output, not
@@ -52,8 +60,19 @@ Notes:
 
 ## Performance expectations
 
-CPU-only inference: roughly 70–80 tokens/sec prompt processing, 7–12
-tokens/sec generation, on this machine. Agent mode in Continue sends
+CPU-only inference, measured on this machine at `Q4_K_M`:
+
+| Model | Prompt tok/s | Generation tok/s |
+| --- | --- | --- |
+| MiniCPM-V-4.6 | ~65–88 | ~13–15 |
+| Hermes-3-Llama-3.1-8B | ~8 | ~3 |
+
+Model size matters far more than any config tweak here — swapping to an
+8B model drops generation speed by roughly 5x compared to MiniCPM-V.
+Factor that into which model you pick for interactive use versus
+something you can wait longer on.
+
+Agent mode in Continue sends
 substantial system-prompt/tool-schema overhead on every request (often
 1000+ tokens even for a short message), which dominates latency more
 than the visible reply length does. For faster local chat:

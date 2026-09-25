@@ -15,10 +15,20 @@ All notable changes to this project are documented here.
 - `mem_limit: 16g` hard cap on `bunker`, as a safety ceiling.
 - GGUF quantization naming glossary in `docs/models.md` (`Q`/`IQ`/`K`
   schemes, bit-depth, `_S`/`_M`/`_L`/`_XS` suffixes).
-
-### Removed
-
-- Empty, unused `config/` directory.
+- `MODEL_FILE` environment variable parameterizes which GGUF `bunker`
+  loads (`compose.yaml`, `.env.example`), instead of hand-editing
+  `--model`. Downloaded and documented four additional candidate models
+  (Hermes-3-Llama-3.1-8B, Qwen2.5-Coder-7B-Instruct, Llama-3.2-3B-Instruct,
+  Phi-4-mini-instruct) alongside MiniCPM-V in `docs/models.md`, evaluating
+  them against MiniCPM-V's weak agentic tool-selection (see
+  `docs/troubleshooting.md`).
+- `config/continue.config.yaml.example` — Continue config template
+  listing an entry per available model (only one meant to be active at
+  a time, matching `MODEL_FILE`).
+- `.markdownlint.json` — scopes `MD024` to sibling headings only (so
+  repeated `### Added`/`### Removed` across CHANGELOG version sections
+  don't trip it) and excludes code blocks/tables from `MD013` line
+  length.
 
 ## [1.0.0] - 2026-09-25
 

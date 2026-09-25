@@ -1,6 +1,35 @@
 # Models
 
-## MiniCPM-V 4.6 Q4_K_M
+## Selecting which model to load
+
+`compose.yaml` reads the model filename from the `MODEL_FILE` environment
+variable, defaulting to `MiniCPM-V-4_6-Q4_K_M.gguf` if unset:
+
+```yaml
+- --model
+- /models/${MODEL_FILE:-MiniCPM-V-4_6-Q4_K_M.gguf}
+```
+
+To switch models, either set it in a local `.env` file (gitignored; copy
+`.env.example` and uncomment one line), or pass it inline for a one-off
+run:
+
+```sh
+MODEL_FILE=Hermes-3-Llama-3.1-8B.Q4_K_M.gguf docker compose up -d --force-recreate bunker
+```
+
+The file must already exist under `models/` — see [setup.md](setup.md)
+for downloading one. After switching, re-run `scripts/verify.sh` (or
+`.ps1`) to confirm it loaded correctly.
+
+## Available models
+
+All currently downloaded in `models/` (gitignored — none of these files
+are in the repo itself). `Q4_K_M` throughout for a consistent
+size/quality/speed point; see the [glossary](#gguf-quantization-naming-glossary)
+below if these codes are unfamiliar.
+
+### MiniCPM-V-4.6 (default)
 
 ```text
 Repository:
@@ -12,23 +41,99 @@ Repository:
 Filename:
   MiniCPM-V-4_6-Q4_K_M.gguf
 
-Format:
-  GGUF
-
-Quantization:
-  Q4_K_M
-
 Size:
   ~529 MB
-
-Expected location:
-  models/MiniCPM-V-4_6-Q4_K_M.gguf
 
 SHA256:
   6b0c74962c44bc6bf4b655b9b02c13eda9d5a0491543ae976d1ac18e4b7892e
 
 Multimodal projector:
-  Not currently installed.
+  Not currently installed — see below.
+
+Notes:
+  Vision-language model, run text-only. Weak at agentic tool
+  selection/argument construction — see troubleshooting.md for the
+  concrete failures hit in Continue's Agent mode.
+```
+
+### Hermes-3-Llama-3.1-8B
+
+```text
+Repository:
+  https://huggingface.co/NousResearch/Hermes-3-Llama-3.1-8B-GGUF
+
+Filename:
+  Hermes-3-Llama-3.1-8B.Q4_K_M.gguf
+
+Size:
+  ~4.9 GB
+
+SHA256:
+  d4403ce5a6e930f4c2509456388c20d633a15ff08dd52ef3b142ff1810ec355
+
+Notes:
+  Nous Research fine-tune of Llama 3.1 8B, specifically trained for
+  agentic/function-calling use — the candidate fix for MiniCPM-V's
+  tool-selection weakness.
+```
+
+### Qwen2.5-Coder-7B-Instruct
+
+```text
+Repository:
+  https://huggingface.co/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF
+
+Filename:
+  Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
+
+Size:
+  ~4.7 GB
+
+SHA256:
+  1664fccab734674a50763490a8c6931b70e3f2f8ec10031b54806d30e5f956b
+
+Notes:
+  Coding-focused instruct model, generally solid at tool-calling.
+```
+
+### Llama-3.2-3B-Instruct
+
+```text
+Repository:
+  https://huggingface.co/hugging-quants/Llama-3.2-3B-Instruct-Q4_K_M-GGUF
+
+Filename:
+  llama-3.2-3b-instruct-q4_k_m.gguf
+
+Size:
+  ~2.0 GB
+
+SHA256:
+  c55a83bfb6396799337853ca69918a0b9bbb2917621078c34570bc17d20fd7a
+
+Notes:
+  Smaller/faster than the 7-8B options; decent tool-calling support,
+  a reasonable tradeoff if RAM/speed matters more than best accuracy.
+```
+
+### Phi-4-mini-instruct
+
+```text
+Repository:
+  https://huggingface.co/bartowski/microsoft_Phi-4-mini-instruct-GGUF
+
+Filename:
+  microsoft_Phi-4-mini-instruct-Q4_K_M.gguf
+
+Size:
+  ~2.5 GB
+
+SHA256:
+  01999f17c39cc3074afae5e9c539bc82d45f2dd7faa3917c66cbef76fce8c0c
+
+Notes:
+  Small Microsoft model, 128K context support, decent instruction
+  following and tool-calling for its size.
 ```
 
 ## Why no multimodal projector
